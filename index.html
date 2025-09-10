@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CLASSIFIED ACCESS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #000;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        /* Terminal Background Effect */
+        .terminal-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .terminal-line {
+            position: absolute;
+            color: rgba(0, 255, 0, 0.3);
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            white-space: nowrap;
+            animation: terminalScroll 15s linear infinite;
+        }
+
+        @keyframes terminalScroll {
+            0% { 
+                transform: translateX(100vw);
+                opacity: 0;
+            }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { 
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+        }
+
+        .container {
+            background: linear-gradient(145deg, #0a0a0a, #1a1a1a);
+            border-radius: 5px;
+            border: 2px solid #00ff00;
+            box-shadow: 
+                0 0 30px rgba(0, 255, 0, 0.3),
+                inset 0 0 30px rgba(0, 255, 0, 0.1);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(0, 255, 0, 0.1), 
+                transparent
+            );
+            animation: scanlinePass 3s ease-in-out infinite;
+        }
+
+        @keyframes scanlinePass {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Agency Header */
+        .agency-header {
+            color: #00ff00;
+            font-size: 12px;
+            text-align: left;
+            margin-bottom: 30px;
+            font-family: 'Courier New', monospace;
+            border-bottom: 1px solid #00ff00;
+            padding-bottom: 10px;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        }
+
+        .classified-banner {
+            color: #ff0000;
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid #ff0000;
+            padding: 5px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.7; }
+        }
+
+        .heart {
+            font-size: 60px;
+            color: #00ff00;
+            margin-bottom: 20px;
+            animation: heartbeat 2s infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        h1 {
+            color: #00ff00;
+            margin-bottom: 30px;
+            font-size: 24px;
+            font-family: 'Courier New', monospace;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #00ff00;
+            font-size: 14px;
+            font-family: 'Courier New', monospace;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #00ff00;
+            border-radius: 3px;
+            font-size: 18px;
+            text-align: center;
+            background: #000;
+            color: #00ff00;
+            transition: all 0.3s ease;
+            letter-spacing: 8px;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            box-shadow: 
+                0 0 10px rgba(0, 255, 0, 0.3),
+                inset 0 0 10px rgba(0, 255, 0, 0.1);
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #00ff00;
+            background: rgba(0, 255, 0, 0.05);
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+        }
+
+        input::placeholder {
+            color: rgba(0, 255, 0, 0.5);
+        }
+
+        button {
+            background: linear-gradient(45deg, #003300, #006600);
+            color: #00ff00;
+            border: 2px solid #00ff00;
+            padding: 15px 40px;
+            border-radius: 3px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+            font-family: 'Courier New', monospace;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: linear-gradient(45deg, #006600, #00aa00);
+            box-shadow: 0 0 25px rgba(0, 255, 0, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .error {
+            color: #ff0000;
+            margin-top: 15px;
+            font-style: italic;
+            font-family: 'Courier New', monospace;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+        }
+
+        /* Matrix Scanner */
+        .matrix-scanner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .matrix-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            overflow: hidden;
+        }
+
+        .matrix-column {
+            position: absolute;
+            top: -100%;
+            font-size: 18px;
+            line-height: 20px;
+            animation: matrixFall 4s linear infinite;
+            opacity: 0.8;
+        }
+
+        @keyframes matrixFall {
+            0% {
+                top: -100%;
+                opacity: 1;
+            }
+            100% {
+                top: 100vh;
+                opacity: 0;
+            }
+        }
+
+        .scan-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                #00ff00 20%, 
+                #00ff00 80%, 
+                transparent 100%);
+            box-shadow: 
+                0 0 20px #00ff00,
+                0 0 40px rgba(0, 255, 0, 0.5),
+                0 2px 10px rgba(0, 255, 0, 0.8);
+            animation: screenScan 5s ease-in-out infinite;
+            z-index: 10;
+        }
+
+        @keyframes screenScan {
+            0% { 
+                top: 0; 
+                opacity: 0;
+            }
+            10% { 
+                opacity: 1;
+            }
+            90% { 
+                opacity: 1;
+            }
+            100% { 
+                top: 100vh; 
+                opacity: 0;
+            }
+        }
+
+        .scan-content {
+            position: relative;
+            z-index: 20;
+            text-align: center;
+        }
+
+        .scan-instruction {
+            font-size: 24px;
+            color: #ffff00;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 40px;
+            text-shadow: 0 0 15px rgba(255, 255, 0, 0.5);
+            font-family: 'Courier New', monospace;
+            animation: instructionPulse 2s infinite;
+            border: 2px solid #ffff00;
+            padding: 15px 25px;
+            background: rgba(255, 255, 0, 0.1);
+        }
+
+        @keyframes instructionPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        .scan-text {
+            font-size: 28px;
+            color: #00ff00;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 50px;
+            text-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+            animation: textPulse 2s infinite;
+            font-family: 'Courier New', monospace;
+        }
+
+        @keyframes textPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .scanning-dots::after {
+            content: '';
+            animation: dots 2s infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: ''; }
+            40% { content: '.'; }
+            60% { content: '..'; }
+            80%, 100% { content: '...'; }
+        }
+
+        /* Full Screen Progress Bar */
+        .full-screen-progress {
+            position: fixed;
+            bottom: 100px;
+            left: 0;
+            width: 100vw;
+            height: 10px;
+            background: rgba(0, 255, 0, 0.2);
+            border-top: 2px solid #00ff00;
+            border-bottom: 2px solid #00ff00;
+            z-index: 25;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff00, #00cc00);
+            width: 0%;
+            animation: fullScreenProgressFill 24s linear forwards;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.8);
+            position: relative;
+        }
+
+        @keyframes fullScreenProgressFill {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        .progress-bar-fill::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: -2px;
+            width: 4px;
+            height: calc(100% + 4px);
+            background: #ffffff;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+        }
+
+        /* Fact Display - Positioned on Progress Bar */
+        .fact-display {
+            position: fixed;
+            bottom: 120px;
+            left: 0;
+            width: 100vw;
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            color: #00ff00;
+            text-align: left;
+            z-index: 30;
+            opacity: 0;
+            padding: 0 20px;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        }
+
+        .fact-display.show {
+            animation: factSlide 1.5s ease-out forwards;
+        }
+
+        @keyframes factSlide {
+            0% { 
+                opacity: 0; 
+                transform: translateX(-50px);
+            }
+            50% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            100% { 
+                opacity: 1; 
+                transform: translateX(0);
+            }
+        }
+
+        .success-msg {
+            font-size: 32px;
+            color: #00ff00;
+            font-weight: bold;
+            margin-top: 30px;
+            opacity: 0;
+            animation: successAppear 2s ease-out 26s forwards;
+            text-shadow: 0 0 20px rgba(0, 255, 0, 0.8);
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            border: 2px solid #00ff00;
+            padding: 20px;
+            background: rgba(0, 255, 0, 0.1);
+        }
+
+        @keyframes successAppear {
+            0% { 
+                opacity: 0; 
+                transform: scale(0.8) translateY(20px);
+            }
+            50% { 
+                opacity: 1; 
+                transform: scale(1.1) translateY(0);
+            }
+            100% { 
+                opacity: 1; 
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        /* File Selection Styles */
+        .file-item {
+            background: linear-gradient(145deg, #1a1a1a, #0a0a0a);
+            border: 1px solid #00ff00;
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: #00ff00;
+            text-align: left;
+            border-radius: 3px;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .file-item:hover {
+            background: linear-gradient(145deg, #003300, #006600);
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .special-file {
+            border-color: #ff6b6b !important;
+            color: #ff6b6b !important;
+            box-shadow: 0 0 10px rgba(255, 107, 107, 0.2) !important;
+        }
+
+        .special-file:hover {
+            background: linear-gradient(145deg, #330000, #660000) !important;
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.4) !important;
+        }
+
+        /* File Opening Animation */
+        .file-opening {
+            animation: fileOpen 2s ease-out forwards;
+        }
+
+        @keyframes fileOpen {
+            0% {
+                transform: scale(1);
+                background: linear-gradient(145deg, #330000, #660000);
+            }
+            25% {
+                transform: scale(1.05);
+                background: linear-gradient(145deg, #ff6b6b, #ff8e8e);
+                box-shadow: 0 0 30px rgba(255, 107, 107, 0.8);
+            }
+            50% {
+                transform: scale(1.1);
+                background: linear-gradient(145deg, #ffffff, #ffdddd);
+                color: #ff6b6b;
+            }
+            75% {
+                transform: scale(1.2) rotateY(10deg);
+                background: linear-gradient(145deg, #ffffff, #ffeeee);
+                opacity: 0.9;
+            }
+            100% {
+                transform: scale(2) rotateY(90deg);
+                background: linear-gradient(145deg, #ffffff, #ffffff);
+                opacity: 0;
+            }
+        }
+
+        .file-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 10px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* File Content Animation */
+        .file-content-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 3000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            animation: overlayFadeIn 1s ease-out 2s forwards;
+        }
+
+        @keyframes overlayFadeIn {
+            to { opacity: 1; }
+        }
+
+        .file-content-box {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            opacity: 0;
+            transform: scale(0.8) rotateY(-90deg);
+            animation: contentAppear 1s ease-out 2.5s forwards;
+        }
+
+        @keyframes contentAppear {
+            to { 
+                opacity: 1; 
+                transform: scale(1) rotateY(0deg);
+            }
+        }
+
+        /* Love Letter Styles */
+        .letter {
+            font-family: 'Georgia', serif;
+        }
+
+        .letter h2 {
+            color: #ff6b6b;
+            margin-bottom: 25px;
+            font-size: 24px;
+        }
+
+        .letter-content {
+            color: #333;
+            line-height: 1.8;
+            font-size: 16px;
+            text-align: left;
+            margin-bottom: 25px;
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .signature {
+            text-align: right;
+            font-style: italic;
+            color: #666;
+            margin-top: 30px;
+            font-size: 18px;
+        }
+
+        @media (max-width: 480px) {
+            .container { 
+                padding: 30px 20px; 
+                max-width: 95%;
+            }
+            h1 { font-size: 20px; }
+            .heart { font-size: 50px; }
+            .fact-display { 
+                font-size: 14px; 
+                padding: 0 15px;
+            }
+            .agency-header {
+                font-size: 10px;
+            }
+            .scan-instruction {
+                font-size: 18px;
+                padding: 10px 15px;
+            }
+            .file-grid {
+                grid-template-columns: 1fr;
+            }
+            .file-item {
+                font-size: 12px;
+                padding: 12px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="terminal-bg" id="terminalBg"></div>
+    
+    <div class="container">
+        <!-- Login Screen -->
+        <div class="content" id="loginScreen">
+            <div class="agency-header">
+                █ CLASSIFIED SYSTEM ACCESS █<br>
+                █ SECURITY LEVEL: MAXIMUM █<br>
+                █ UNAUTHORIZED ACCESS PROHIBITED █
+            </div>
+            
+            <div class="classified-banner">
+                ⚠️ TOP SECRET - EYES ONLY ⚠️
+            </div>
+            
+            <div class="heart">🔒</div>
+            <h1>SECURE DATABASE ENTRY</h1>
+            <p style="color: rgba(0, 255, 0, 0.7); margin-bottom: 30px; font-size: 14px; font-family: 'Courier New', monospace; text-transform: uppercase;">
+                Enter authorized access code to proceed...
+            </p>
+            
+            <div class="input-group">
+                <label for="passcode">Authorization Code:</label>
+                <input type="password" id="passcode" placeholder="••••" maxlength="4">
+            </div>
+            
+            <button onclick="unlockSecret()">🔓 INITIATE BREACH</button>
+            <div class="error" id="errorMsg"></div>
+            
+            <div style="font-size: 10px; color: rgba(0, 255, 0, 0.5); margin-top: 20px; font-family: 'Courier New', monospace;">
+                HINT: SCANNING 
+            </div>
+        </div>
+
+        <!-- File Selection Screen -->
+        <div class="content hidden" id="fileScreen">
+            <div style="background: #000; min-height: 100vh; padding: 20px; width: 100%; color: #00ff00; font-family: 'Courier New', monospace;">
+                <div style="max-width: 800px; margin: 0 auto; padding-bottom: 60px;">
+                    <div style="font-size: 20px; color: #00ff00; margin-bottom: 20px; text-shadow: 0 0 15px rgba(0, 255, 0, 0.5); text-transform: uppercase; letter-spacing: 2px; text-align: center;">
+                        📁 CLASSIFIED DATABASE - FILE SYSTEM ACCESS
+                    </div>
+                    <div style="font-size: 11px; color: rgba(0, 255, 0, 0.7); margin-bottom: 25px; text-align: center;">
+                        SECURITY CLEARANCE: LEVEL 3 | AUTHORIZED FILES: 47 | RESTRICTED FILES: 2,847
+                    </div>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <div class="file-item" onclick="selectFile('classified1')">
+                            🔒 CLASSIFIED_BUDGET_2024.xlsx
+                        </div>
+                        <div class="file-item" onclick="selectFile('classified2')">
+                            🔒 OPERATION_NIGHTFALL.pdf
+                        </div>
+                        <div class="file-item" onclick="selectFile('classified3')">
+                            🔒 PERSONNEL_RECORDS_A-D.db
+                        </div>
+                        <div class="file-item" onclick="selectFile('classified4')">
+                            🔒 THREAT_ASSESSMENT_Q3.doc
+                        </div>
+                        <div class="file-item" onclick="selectFile('classified5')">
+                            🔒 SURVEILLANCE_LOGS_NYC.txt
+                        </div>
+                        <div class="file-item" onclick="selectFile('classified6')">
+                            🔒 ASSET_LOCATIONS_GLOBAL.kml
+                        </div>
+                        <div class="file-item" onclick="selectFile('classified7')">
+                            🔒 COMMUNICATION_PROTOCOLS.pdf
+                        </div>
+                        <div class="file-item" onclick="selectFile('classified8')">
+                            🔒 SAFE_HOUSE_COORDINATES.gpx
+                        </div>
+                        <div class="file-item" onclick="selectFile('classified9')">
+                            🔒 FINANCIAL_TRANSFERS_2024.csv
+                        </div>
+                        <div class="file-item" onclick="selectFile('classified10')">
+                            🔒 CONTACT_DATABASE_ENCRYPTED.db
+                        </div>
+                        <div class="file-item" onclick="selectFile('classified11')">
+                            🔒 MISSION_BRIEFING_ALPHA.ppt
+                        </div>
+                        <div class="file-item" onclick="selectFile('classified12')">
+                            🔒 SECURITY_FOOTAGE_ARCHIVE.mp4
+                        </div>
+                        <div class="file-item special-file" onclick="selectFile('love-letter')" style="border-color: #ff6b6b; color: #ff6b6b; box-shadow: 0 0 10px rgba(255, 107, 107, 0.2); font-weight: bold;">
+                            💕 Doms_secret_love_letter.txt
+                        </div>
+                        <div class="file-item" onclick="selectFile('classified13')">
+                            🔒 EXTRACTION_ROUTES_EU.pdf
+                        </div>
+                        <div class="file-item" onclick="selectFile('classified14')">
+                            🔒 WEAPONS_INVENTORY_2024.xlsx
+                        </div>
+                        <div class="file-item" onclick="selectFile('classified15')">
+                            🔒 INTEL_REPORTS_ASIA.doc
+                        </div>
+                        <div class="file-item" onclick="selectFile('classified16')">
+                            🔒 DIPLOMATIC_CABLES_SECURE.txt
+                        </div>
+                        <div class="file-item" onclick="selectFile('classified17')">
+                            🔒 CYBER_WARFARE_PROTOCOLS.pdf
+                        </div>
+                        <div class="file-item" onclick="selectFile('classified18')">
+                            🔒 AGENT_TRAINING_MANUAL.pdf
+                        </div>
+                        <div class="file-item" onclick="selectFile('classified19')">
+                            🔒 COUNTER_INTEL_OPERATIONS.doc
+                        </div>
+                        <div class="file-item" onclick="selectFile('classified20')">
+                            🔒 EMERGENCY_PROTOCOLS_RED.txt
+                        </div>
+                        <div class="file-item" onclick="selectFile('classified21')">
+                            🔒 TECHNOLOGY_ACQUISITIONS.xlsx
+                        </div>
+                        <div class="file-item" onclick="selectFile('classified22')">
+                            🔒 PSYOPS_MANUAL_V3.pdf
+                        </div>
+                        <div class="file-item" onclick="selectFile('classified23')">
+                            🔒 SATELLITE_IMAGERY_ARCHIVE.tif
+                        </div>
+                        <div class="file-item" onclick="selectFile('classified24')">
+                            🔒 CHEMICAL_ANALYSIS_REPORTS.doc
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 30px; padding: 15px; border: 1px solid rgba(0, 255, 0, 0.3); border-radius: 5px; font-size: 10px; color: rgba(0, 255, 0, 0.6);">
+                        <div style="color: #ffff00; margin-bottom: 8px;">⚠️ SECURITY NOTICE:</div>
+                        <div>• Unauthorized access attempts are logged and monitored</div>
+                        <div>• File access requires appropriate security clearance</div>
+                        <div>• Report suspicious files to security@[REDACTED].gov</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Love Letter Screen -->
+        <div class="content hidden letter" id="letterScreen">
+            <div style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; position: fixed; top: 0; left: 0; width: 100%; z-index: 2000;">
+                <div style="background: white; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); padding: 40px; max-width: 500px; width: 90%; text-align: center;">
+                    <h2>The Secret</h2>
+                    
+                    <div class="letter-content">
+                        <p>It was the summer of '24. I was hanging out with Evin at In-N-Out when he asked me if I was talking to anyone. At the time, I wasn't, so I said no. But then he said, "Oh, come on, you have no one on your mind?" After a long pause, he knew there was a girl.</p>
+                        
+                        <p>I didn't want to tell him or any of my friends because I felt like none of them would understand. But Evin just couldn't let it go. He kept asking and asking until eventually he pried it out of me.</p>
+                        
+                        <p>So I said, "Evin, I don't usually remember a lot to begin with, especially not when I drink, but there was one occasion that stuck with me. That was the night I kissed Sophia."</p>
+                        
+                        <p>Now, we always told each other that we were so drunk we couldn't remember it and that it didn't mean anything. But the truth is, I remember every second of it. I could never admit that to you, because I knew you didn't feel the same way about it.</p>
+                        
+                        <p>I'm not going to say that moment changed everything or suddenly changed how I felt about you. But for some reason, I couldn't get that kiss out of my head. As time passed, we grew closer and closer as friends. You would think that was a good thing, but honestly, it only made things harder.</p>
+                        
+                        <p>I realized I had fallen for you. And it wasn't just your big, colorful eyes that make me feel warm, or your strong personality that keeps me on my toes, or even your smile that makes my worries disappear. It was your heart. You have one of the biggest hearts I've ever known. You care about others, and you're always willing to help when anyone needs anything.</p>
+                        
+                        <p>I told Evin all of this, and he asked if I was going to pursue it. I told him no. When he asked why, my response was, "She's way out of my league. She deserves the world, and a guy who's smart and a gentleman. I fear I can't offer enough." Evin tried his best to convince me that I could, but I lacked the confidence.</p>
+                        
+                        <p>Months went by, and Evin brought it up now and then, but nothing changed. Then February came around. I felt like something was happening between you and me. I could be wrong, but it felt like there was a spark neither of us could deny.</p>
+                        
+                        <p>I told Evin about it while we were playing soccer, and he told me to be confident in myself, that if the opportunity was there, I should take it. Little did he know I would end up taking his advice, and six months later, I'd ask you to be my girlfriend. I think deep down you were always the girl I wanted. I just hope I can give you everything you deserve and more.</p>
+                    </div>
+                    
+                    <div class="signature">
+                        Forever and always yours,<br>
+                        <strong>Your Loving Boyfriend ❤️</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Matrix Scanner -->
+    <div class="matrix-scanner hidden" id="scannerScreen">
+        <div class="matrix-bg" id="matrixBg"></div>
+        <div class="scan-line"></div>
+        
+        <div class="scan-content">
+            <div class="scan-instruction">⚠️ PLEASE HOLD STILL - THE SCAN WILL TAKE A MOMENT ⚠️</div>
+            <div class="scan-text">SCANNING<span class="scanning-dots"></span></div>
+            
+            <div class="full-screen-progress">
+                <div class="progress-bar-fill"></div>
+            </div>
+            
+            <div class="fact-display" id="factDisplay"></div>
+            
+            <div class="success-msg">✅ SCAN COMPLETE - WELCOME SOPHIA DALUISIO - ACCESS GRANTED</div>
+        </div>
+    </div>
+
+    <script>
+        // Terminal background animation
+        function createTerminalLines() {
+            const terminalBg = document.getElementById('terminalBg');
+            const lines = [
+                'ACCESSING SECURE NETWORK... [OK]',
+                'BYPASSING FIREWALL... [OK]',
+                'DECRYPTING DATA STREAM... [OK]',
+                'ESTABLISHING SECURE CONNECTION... [OK]',
+                'LOADING CLASSIFIED FILES... [OK]',
+                'AUTHENTICATING USER CREDENTIALS... [OK]',
+                'INITIALIZING MATRIX PROTOCOL... [OK]'
+            ];
+            
+            setInterval(() => {
+                const line = document.createElement('div');
+                line.className = 'terminal-line';
+                line.textContent = lines[Math.floor(Math.random() * lines.length)];
+                line.style.top = Math.random() * 100 + '%';
+                line.style.animationDelay = Math.random() * 2 + 's';
+                terminalBg.appendChild(line);
+                
+                setTimeout(() => {
+                    line.remove();
+                }, 15000);
+            }, 3000);
+        }
+        
+        // Matrix rain effect
+        function createMatrixRain() {
+            const matrixBg = document.getElementById('matrixBg');
+            const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+            
+            for (let i = 0; i < 20; i++) {
+                setTimeout(() => {
+                    const column = document.createElement('div');
+                    column.className = 'matrix-column';
+                    column.style.left = Math.random() * 100 + '%';
+                    column.style.animationDelay = Math.random() * 4 + 's';
+                    
+                    let text = '';
+                    for (let j = 0; j < 20; j++) {
+                        text += chars[Math.floor(Math.random() * chars.length)] + '<br>';
+                    }
+                    column.innerHTML = text;
+                    
+                    matrixBg.appendChild(column);
+                    
+                    setTimeout(() => {
+                        column.remove();
+                    }, 4000);
+                }, i * 200);
+            }
+        }
+        
+        // Show scanning facts during progress
+        function showScanningFacts() {
+            const facts = [
+                '> Personal data acquired: Cat #1 - Loki',
+                '> Personal data acquired: Cat #2 - Prince',
+                '> Family record found: Mother - Marcela Daluisio',
+                '> Family record found: Father - Diego Daluisio',
+                '> Family record found: Brother - Franco Daluisio',
+                '> Social network analyzed: Best Friend - Abigail Langsford',
+                '> Location data verified: Lives on 1332 E Ninth St',
+                '> Profile compilation complete - Access granted'
+            ];
+            
+            const factDisplay = document.getElementById('factDisplay');
+            let currentFact = 0;
+            
+            const factInterval = setInterval(() => {
+                if (currentFact < facts.length) {
+                    factDisplay.textContent = facts[currentFact];
+                    factDisplay.classList.add('show');
+                    
+                    setTimeout(() => {
+                        factDisplay.classList.remove('show');
+                    }, 2500);
+                    
+                    currentFact++;
+                } else {
+                    clearInterval(factInterval);
+                }
+            }, 3000);
+        }
+        
+        // Main unlock function
+        function unlockSecret() {
+            const passcode = document.getElementById('passcode').value.toLowerCase();
+            const errorMsg = document.getElementById('errorMsg');
+            
+            if (passcode === 'dork') {
+                // Hide login screen
+                document.getElementById('loginScreen').classList.add('hidden');
+                
+                // Show matrix scanner
+                document.getElementById('scannerScreen').classList.remove('hidden');
+                
+                // Start matrix rain
+                createMatrixRain();
+                
+                // Show scanning facts
+                showScanningFacts();
+                
+                // After scan completes, show file selection
+                setTimeout(() => {
+                    document.getElementById('scannerScreen').classList.add('hidden');
+                    document.getElementById('fileScreen').classList.remove('hidden');
+                }, 28000);
+                
+            } else {
+                errorMsg.textContent = '❌ ACCESS DENIED - INVALID AUTHORIZATION CODE';
+                setTimeout(() => {
+                    errorMsg.textContent = '';
+                }, 3000);
+            }
+        }
+        
+        // Function to show next screen
+        function showNextScreen() {
+            document.getElementById('letterScreen').classList.add('hidden');
+            document.getElementById('nextScreen').classList.remove('hidden');
+        }
+        
+        // File selection function
+        function selectFile(fileType) {
+            if (fileType === 'love-letter') {
+                // Add file opening animation
+                event.target.classList.add('file-opening');
+                
+                // Show love letter after animation
+                setTimeout(() => {
+                    document.getElementById('fileScreen').classList.add('hidden');
+                    document.getElementById('letterScreen').classList.remove('hidden');
+                }, 2000);
+            } else {
+                // For other files, show access denied
+                alert('🔒 ACCESS DENIED - INSUFFICIENT SECURITY CLEARANCE');
+            }
+        }
+        
+        // Handle Enter key on passcode input
+        document.addEventListener('DOMContentLoaded', function() {
+            const passcodeInput = document.getElementById('passcode');
+            
+            passcodeInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    unlockSecret();
+                }
+            });
+            
+            // Start terminal background animation
+            createTerminalLines();
+        });
+    </script>
+</body>
+</html>
